@@ -1,0 +1,59 @@
+// Prisma schema — Postgres (Prisma 7).
+// The connection URL lives in prisma.config.ts (CLI) and the PrismaPg driver
+// adapter (runtime). Run `npm run db:push` to sync this schema to your database.
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  name            String
+  role            String // target job role, e.g. "Backend Engineer"
+  experienceLevel String // "junior" | "mid" | "senior"
+  createdAt       DateTime  @default(now())
+  sessions        Session[]
+}
+
+// One interview attempt.
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String // "behavioral" | "technical" | "system_design" | "hr"
+  status     String    @default("active") // "active" | "completed"
+  // Running interview state carried across turns by the LangGraph engine:
+  // { coverage, runningScores, difficulty, questionCount, followupsOnTopic, evaluatedUpTo }
+  state      Json      @default("{}")
+  // Full transcript as [{ role, content }] — the source of truth for the report.
+  transcript Json      @default("[]")
+  createdAt  DateTime  @default(now())
+  endedAt    DateTime?
+  report     Report?
+
+  @@index([userId, createdAt])
+}
+
+// Generated feedback report for a completed session.
+model Report {
+  id           String   @id @default(cuid())
+  sessionId    String   @unique
+  session      Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  overallScore Int // 0-100
+  summary      String
+  dimensions   Json // [{ name, score, comment }]
+  strengths    Json // [{ point, quote }]
+  improvements Json // [{ point, quote, suggestion }]
+  createdAt    DateTime @default(now())
+}
