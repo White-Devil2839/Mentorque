@@ -21,7 +21,7 @@ export function Signup() {
     setBusy(true);
     try {
       await register({ name, email, password, role, experienceLevel });
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError((err as Error).message);
     } finally {

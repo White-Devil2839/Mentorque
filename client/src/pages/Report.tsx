@@ -31,7 +31,7 @@ export function ReportPage() {
       <div className="container">
         <div className="card center">
           <p className="error">{error}</p>
-          <Link className="btn" to="/">
+          <Link className="btn" to="/dashboard">
             Back to dashboard
           </Link>
         </div>
@@ -62,7 +62,7 @@ export function ReportPage() {
           <p className="muted">
             This interview doesn't have a completed report.
           </p>
-          <Link className="btn primary" to="/">
+          <Link className="btn primary" to="/dashboard">
             Back to dashboard
           </Link>
         </div>
@@ -74,7 +74,7 @@ export function ReportPage() {
     <div className="container stack">
       <div className="row-between">
         <div>
-          <Link to="/" className="muted">
+          <Link to="/dashboard" className="muted">
             ← Dashboard
           </Link>
           <h1 style={{ margin: "6px 0 0" }}>{meta.label} — Feedback</h1>

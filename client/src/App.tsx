@@ -1,6 +1,7 @@
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "./auth";
+import { Landing } from "./pages/Landing";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Dashboard } from "./pages/Dashboard";
@@ -20,10 +21,10 @@ function Nav() {
   const navigate = useNavigate();
   return (
     <div className="nav">
-      <Link to="/" className="brand">
+      <Link to={user ? "/dashboard" : "/"} className="brand">
         Mentor<span>que</span>
       </Link>
-      {user && (
+      {user ? (
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <span className="muted" style={{ fontSize: 14 }}>
             {user.name}
@@ -35,11 +36,20 @@ function Nav() {
             className="btn"
             onClick={() => {
               logout();
-              navigate("/login");
+              navigate("/");
             }}
           >
             Log out
           </button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <Link className="btn" to="/login">
+            Log in
+          </Link>
+          <Link className="btn primary" to="/signup">
+            Get started
+          </Link>
         </div>
       )}
     </div>
@@ -55,15 +65,19 @@ export function App() {
       <Nav />
       <Routes>
         <Route
+          path="/"
+          element={token ? <Navigate to="/dashboard" replace /> : <Landing />}
+        />
+        <Route
           path="/login"
-          element={token ? <Navigate to="/" replace /> : <Login />}
+          element={token ? <Navigate to="/dashboard" replace /> : <Login />}
         />
         <Route
           path="/signup"
-          element={token ? <Navigate to="/" replace /> : <Signup />}
+          element={token ? <Navigate to="/dashboard" replace /> : <Signup />}
         />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <Protected>
               <Dashboard />
