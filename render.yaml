@@ -1,0 +1,27 @@
+# Render Blueprint — deploys the API as a web service.
+# In Render: New → Blueprint → point at this repo, then fill in the env vars
+# marked sync:false in the dashboard.
+services:
+  - type: web
+    name: mentorque-api
+    runtime: node
+    plan: free
+    # Singapore: closest region to the Neon Postgres (ap-southeast-1), which
+    # keeps the 2-3 DB queries per interview turn fast.
+    region: singapore
+    buildCommand: npm install --include=dev && npm run build --workspace server
+    startCommand: npm run start --workspace server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false # Neon connection string
+      - key: JWT_SECRET
+        sync: false # long random string
+      - key: GEMINI_API_KEY
+        sync: false # from https://aistudio.google.com/apikey
+      - key: VITE_VAPI_PUBLIC_KEY
+        sync: false # Vapi PUBLIC key — served to the browser via /interview/start
+      # PUBLIC_SERVER_URL is intentionally omitted: the server falls back to
+      # Render's RENDER_EXTERNAL_URL, so the Vapi webhook base self-configures.

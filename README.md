@@ -171,6 +171,30 @@ breakdown and the optimization levers are in **[COST.md](./COST.md)**.
 
 ---
 
+## Deployment (Render + Vercel)
+
+**Backend — Render** (config lives in [render.yaml](./render.yaml)):
+1. Render → *New → Blueprint* → select this GitHub repo. It picks up `render.yaml`
+   (Node 22, Singapore region — colocated with the Neon database, `/health` checks).
+2. Fill in the four env vars when prompted: `DATABASE_URL`, `JWT_SECRET`,
+   `GEMINI_API_KEY`, `VITE_VAPI_PUBLIC_KEY`.
+3. That's it — `PUBLIC_SERVER_URL` self-configures from Render's
+   `RENDER_EXTERNAL_URL`, so the Vapi webhook automatically points at the
+   deployed URL (no ngrok in production).
+
+**Frontend — Vercel:**
+1. Vercel → *Add New → Project* → import the repo.
+2. Set **Root Directory = `client`** (framework preset: Vite; build and output
+   are auto-detected). `client/vercel.json` adds the SPA rewrite so deep links
+   like `/report/:id` work.
+3. Add one env var: `VITE_API_URL` = your Render URL (e.g.
+   `https://mentorque-api.onrender.com`). Redeploy if you add it after the
+   first build — Vite inlines it at build time.
+
+> **Free-tier note:** Render free services sleep after ~15 min idle; the first
+> request then takes up to a minute. Hit `https://<api>.onrender.com/health`
+> to warm it up before a demo or interview.
+
 ## Notes & tradeoffs
 
 - **One type, done deeply.** All four types share the same adaptive engine; Behavioral

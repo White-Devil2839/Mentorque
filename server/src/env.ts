@@ -7,6 +7,12 @@ import { z } from "zod";
 dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 dotenv.config();
 
+// On Render, the platform provides the service's public URL — use it as the
+// Vapi webhook base automatically so no manual PUBLIC_SERVER_URL is needed.
+if (!process.env.PUBLIC_SERVER_URL && process.env.RENDER_EXTERNAL_URL) {
+  process.env.PUBLIC_SERVER_URL = process.env.RENDER_EXTERNAL_URL;
+}
+
 const schema = z.object({
   PORT: z.coerce.number().default(4000),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
